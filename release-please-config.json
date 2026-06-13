@@ -13,7 +13,8 @@
           "path": "backend/package.json",
           "jsonpath": "$.version"
         },
-        "cli/pkg/ui/tui.go"
+        "cli/pkg/ui/tui.go",
+        "cli/pkg/config/config.go"
       ]
     }
   }

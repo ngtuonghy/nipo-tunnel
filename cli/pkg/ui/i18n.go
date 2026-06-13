@@ -17,6 +17,7 @@ type Translation struct {
 	DownloadBinary       string
 	EstablishTunnel      string
 	MapSubdomain         string
+	VerifyingDNS         string
 	Starting             string
 	ONLINE               string
 	Waiting              string
@@ -43,12 +44,18 @@ type Translation struct {
 	CmdCompletionShort   string
 	CmdHelpShort         string
 	FlagHelpUsage        string
+	DropStar             string
+	ErrorPrefix          string
+	ErrCFRateLimit       string
 }
 
 // Locales maps language codes to their respective Translation bundles.
 var Locales = map[string]Translation{
 	"en": {
-		Title:                "NIPO TUNNEL by ngtuonghy",
+		Title:                "Nipo Tunnel by ngtuonghy",
+		DropStar:             "Drop a 🌟 on GitHub: https://github.com/ngtuonghy/nipo-tunnel",
+		ErrorPrefix:          "ERROR: ",
+		ErrCFRateLimit:       "failed to get tunnel URL (Cloudflare rate limited - try again in a moment)",
 		Version:              "Version",
 		Status:               "Status",
 		Traffic:              "Traffic",
@@ -61,6 +68,7 @@ var Locales = map[string]Translation{
 		DownloadBinary:       " Downloading tunnel binary...",
 		EstablishTunnel:      " Establishing secure tunnel connection...",
 		MapSubdomain:         " Mapping subdomains with Nipo API...",
+		VerifyingDNS:         " Waiting for Cloudflare to propagate DNS...",
 		Starting:             " Starting...",
 		ONLINE:               "ONLINE",
 		Waiting:              "Waiting...",
@@ -89,7 +97,10 @@ var Locales = map[string]Translation{
 		FlagHelpUsage:        "help for nipo",
 	},
 	"vi": {
-		Title:                "NIPO TUNNEL phát triển bởi ngtuonghy",
+		Title:                "Nipo Tunnel phát triển bởi ngtuonghy",
+		DropStar:             "Để lại 1 🌟 trên GitHub để ủng hộ nhé: https://github.com/ngtuonghy/nipo-tunnel",
+		ErrorPrefix:          "LỖI: ",
+		ErrCFRateLimit:       "không lấy được URL tunnel (Cloudflare giới hạn kết nối - vui lòng thử lại sau giây lát)",
 		Version:              "Version",
 		Status:               "Status",
 		Traffic:              "Traffic",
@@ -102,6 +113,7 @@ var Locales = map[string]Translation{
 		DownloadBinary:       " Đang tải tunnel binary...",
 		EstablishTunnel:      " Đang thiết lập kết nối tunnel...",
 		MapSubdomain:         " Đang đăng ký subdomain với Nipo API...",
+		VerifyingDNS:         " Đang chờ Cloudflare cập nhật DNS...",
 		Starting:             " Đang khởi động...",
 		ONLINE:               "ONLINE",
 		Waiting:              "Đang chờ...",

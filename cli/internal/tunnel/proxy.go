@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -13,6 +12,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	charmlog "github.com/charmbracelet/log"
 )
 
 // RequestLog stores the metadata of an intercepted HTTP request.
@@ -24,11 +25,11 @@ type RequestLog struct {
 	Time       time.Time
 }
 
-// ProxyStats aggregates traffic metrics and maintains a rolling log of recent requests.
+// ProxyStats aggregates traffic metrics.
 type ProxyStats struct {
 	Requests atomic.Uint64
 	Bytes    atomic.Uint64
-	
+
 	mu     sync.RWMutex
 	Recent []RequestLog
 }
@@ -45,17 +46,15 @@ func (s *ProxyStats) AddLog(tunnelName, method, path string, status int) {
 		Status:     status,
 		Time:       time.Now(),
 	})
-	
-	if len(s.Recent) > 5 {
-		s.Recent = s.Recent[len(s.Recent)-5:]
+
+	if len(s.Recent) > 10 {
+		s.Recent = s.Recent[len(s.Recent)-10:]
 	}
 }
 
-// GetRecent returns a copy of the recent request logs.
 func (s *ProxyStats) GetRecent() []RequestLog {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
 	cpy := make([]RequestLog, len(s.Recent))
 	copy(cpy, s.Recent)
 	return cpy
@@ -66,6 +65,7 @@ type Proxy struct {
 	Stats      ProxyStats
 	TargetPort int
 	ListenPort int
+	Logger     *charmlog.Logger
 }
 
 type trackingResponseWriter struct {
@@ -108,10 +108,13 @@ func StartProxy(ctx context.Context, tunnelName string, targetPort int) (*Proxy,
 	if err != nil {
 		return nil, fmt.Errorf("parse target URL http://localhost:%d: %w", targetPort, err)
 	}
+
 	p := &Proxy{TargetPort: targetPort}
 
 	rp := httputil.NewSingleHostReverseProxy(targetURL)
-	rp.ErrorLog = log.New(io.Discard, "", 0)
+	// We can use the logger's standard log adapter for errors
+	logger := charmlog.New(io.Discard)
+	rp.ErrorLog = logger.StandardLog(charmlog.StandardLogOptions{ForceLevel: charmlog.ErrorLevel})
 
 	// Preserve original director behavior, but override Host and Origin
 	// to fool Next.js and Webpack Dev Server into accepting the WebSocket upgrade.
@@ -126,6 +129,12 @@ func StartProxy(ctx context.Context, tunnelName string, targetPort int) (*Proxy,
 	}
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Intercept internal ping requests to hide them from logs and avoid hitting the user's local server
+		if r.Header.Get("User-Agent") == "Nipo-Ping" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		p.Stats.Requests.Add(1)
 		
 		tw := &trackingResponseWriter{ResponseWriter: w, stats: &p.Stats, statusCode: 200}

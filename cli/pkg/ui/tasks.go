@@ -41,6 +41,11 @@ type heartbeatMsg struct {
 	err error
 }
 
+type verifyDNSCompleteMsg struct {
+	id  int
+	err error
+}
+
 type downloadProgressMsg float64
 
 // downloadTask returns a Bubble Tea command that installs the tunnel binary if it is missing,
@@ -145,6 +150,57 @@ func registerTask(ctx context.Context, id int, backendURL, subdomain, targetURL 
 		}
 
 		return registerCompleteMsg{id: id, err: nil}
+	}
+}
+
+// verifyDNSTask returns a Bubble Tea command that polls the public URL to check if Cloudflare DNS is ready.
+func verifyDNSTask(ctx context.Context, id int, publicURL string) tea.Cmd {
+	return func() tea.Msg {
+		client := &http.Client{
+			Timeout: 5 * time.Second,
+			// Do not follow redirects just in case, we only care about the first response
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
+
+		// Timeout after 30 seconds
+		timeout := time.After(30 * time.Second)
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return verifyDNSCompleteMsg{id: id, err: ctx.Err()}
+			case <-timeout:
+				return verifyDNSCompleteMsg{id: id, err: errors.New("Cloudflare DNS timeout (took too long to resolve)")}
+			case <-ticker.C:
+				req, err := http.NewRequestWithContext(ctx, "GET", publicURL, nil)
+				if err != nil {
+					continue
+				}
+				
+				// Add a custom User-Agent so the proxy can intercept and hide this request
+				req.Header.Set("User-Agent", "Nipo-Ping")
+				
+				resp, err := client.Do(req)
+				if err != nil {
+					// Network error, might be temporary, keep trying
+					continue
+				}
+				
+				statusCode := resp.StatusCode
+				resp.Body.Close()
+				
+				// Cloudflare Origin DNS error is usually 530, or 522/523 for bad gateway.
+				// If it's not 530 (1016 error), it means the DNS has propagated.
+				// Even if it returns 502 (backend not ready) or 404 (not found), DNS is alive.
+				if statusCode != 530 {
+					return verifyDNSCompleteMsg{id: id, err: nil}
+				}
+			}
+		}
 	}
 }
 

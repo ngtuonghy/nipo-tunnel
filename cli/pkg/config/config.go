@@ -13,8 +13,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/viper"
+	"github.com/charmbracelet/lipgloss"
 )
 
+var Version = "v0.0.16" // x-release-please-version
 // TunnelConfig holds specifications for a single tunnel.
 type TunnelConfig struct {
 	Name      string `mapstructure:"name"`
@@ -179,7 +181,8 @@ func InitConfig() {
 }
 
 type langSelectModel struct {
-	cursor int
+	cursor   int
+	quitting bool
 }
 
 func (m langSelectModel) Init() tea.Cmd {
@@ -201,6 +204,7 @@ func (m langSelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor++
 			}
 		case "enter", " ":
+			m.quitting = true
 			return m, tea.Quit
 		}
 	}
@@ -208,19 +212,26 @@ func (m langSelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m langSelectModel) View() string {
-	s := "\nWelcome to Nipo Tunnel! / Chào mừng đến với Nipo Tunnel!\n"
-	s += "Please choose your language / Vui lòng chọn ngôn ngữ:\n\n"
+	if m.quitting {
+		return ""
+	}
+	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("62")).Bold(true)
+	cursorStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Bold(true)
+	selectedStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Bold(true)
+	dimStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+
+	s := "\n" + titleStyle.Render("Please choose your language / Vui lòng chọn ngôn ngữ:") + "\n\n"
 
 	options := []string{"English (en)", "Tiếng Việt (vi)"}
 	for i, opt := range options {
-		cursor := "  "
 		if m.cursor == i {
-			cursor = "> "
+			s += cursorStyle.Render("> ") + selectedStyle.Render(opt) + "\n"
+		} else {
+			s += "  " + opt + "\n"
 		}
-		s += cursor + opt + "\n"
 	}
 
-	s += "\n[↑↓ navigate  Enter select]\n"
+	s += "\n" + dimStyle.Render("[↑↓ navigate  Enter select]") + "\n"
 	return s
 }
 
@@ -272,9 +283,48 @@ func EnsureLanguageSelected() {
 		vGlobal.Set("lang", selectedLang)
 		if err := vGlobal.WriteConfigAs(globalPath); err != nil {
 			fmt.Printf("Warning: failed to save language setting: %v\n", err)
-		} else {
-			fmt.Printf("Language saved globally to: %s\n\n", globalPath)
 		}
+
+		step0, step1, step2, step3 := "Nipo Tunnel", "Hello", "Xin chào", "Nipo Tunnel - From localhost to the world!"
+		if selectedLang == "vi" {
+			step0, step1, step2, step3 = "Nipo Tunnel", "Xin chào", "Hello", "Nipo Tunnel - Đưa code nhà làm ra biển lớn!"
+		}
+
+		badgeStyle := lipgloss.NewStyle().
+			Background(lipgloss.Color("62")).
+			Foreground(lipgloss.Color("230")).
+			Padding(0, 1).
+			Bold(true)
+
+		plainStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("62")).
+			Bold(true)
+
+		// Print initial spacing
+		fmt.Print("\n\n")
+
+		// printStep clears the current line using a carriage return and spaces, then prints the new text.
+		printStep := func(text string) {
+			fmt.Print("\r                                                                ")
+			fmt.Printf("\r  %s", text)
+		}
+
+		// Step 0
+		printStep(badgeStyle.Render(step0))
+		time.Sleep(1500 * time.Millisecond)
+
+		// Step 1
+		printStep(badgeStyle.Render(step1))
+		time.Sleep(1500 * time.Millisecond)
+
+		// Step 2
+		printStep(badgeStyle.Render(step2))
+		time.Sleep(1500 * time.Millisecond)
+
+		// Step 3
+		printStep(plainStyle.Render(step3))
+		time.Sleep(2500 * time.Millisecond)
+		fmt.Println() // final newline before starting app
 	}
 }
 

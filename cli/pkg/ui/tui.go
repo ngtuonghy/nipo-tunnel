@@ -27,9 +27,10 @@ const (
 	stateDownloading
 	stateStartingTunnel
 	stateRegistering
+	stateVerifyingDNS
 	stateDone
 	stateError
-	stateConflict // subdomain already in use - waiting for user choice
+	stateConflict // stateConflict indicates the subdomain is already in use, waiting for user choice
 )
 
 // TunnelState tracks the runtime state of a single tunnel instance.
@@ -171,7 +172,7 @@ func (m TunnelModel) Init() tea.Cmd {
 func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// If any tunnel is waiting for conflict resolution, handle menu navigation
+		// Handle interactive menu navigation when a tunnel is in conflict state
 		for i, t := range m.Tunnels {
 			if t.State == stateConflict {
 				switch msg.String() {
@@ -299,7 +300,7 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case registerCompleteMsg:
 		if msg.err != nil {
 			if strings.Contains(msg.err.Error(), "already in use") {
-				// Subdomain conflict - let user choose
+				// Handle subdomain conflict by prompting the user
 				m.Tunnels[msg.id].State = stateConflict
 				m.ConflictCursor = 0
 			} else {
@@ -308,13 +309,25 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		} else {
 			m.Tunnels[msg.id].PublicURL = fmt.Sprintf("https://%s.ngtuonghy.online", m.Tunnels[msg.id].Config.Subdomain)
+			m.Tunnels[msg.id].State = stateVerifyingDNS
+			return m, verifyDNSTask(m.Ctx, msg.id, m.Tunnels[msg.id].PublicURL)
+		}
+		return m, nil
+
+	case verifyDNSCompleteMsg:
+		if msg.err != nil {
+			m.Tunnels[msg.id].State = stateError
+			m.Tunnels[msg.id].Err = msg.err
+			return m, tea.Quit
+		} else {
 			m.Tunnels[msg.id].State = stateDone
 
-			// Start session timer only when tunnel successfully connects
+			// Start the session timer only when the tunnel successfully connects
 			if m.SessionEndsAt.IsZero() {
 				m.SessionEndsAt = time.Now().Add(9 * time.Hour)
 			}
 		}
+
 		// Check if ALL tunnels are now done, then start a single heartbeat for all
 		allOnline := true
 		var activeSubdomains []string
@@ -332,7 +345,7 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case heartbeatMsg:
-		// Re-schedule next heartbeat with current active subdomains
+		// Re-schedule the next heartbeat with the current active subdomains
 		var activeSubdomains []string
 		for _, t := range m.Tunnels {
 			if t.State == stateDone && t.Config.Subdomain != "" {
@@ -365,6 +378,7 @@ func (m TunnelModel) View() string {
 	urlStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("87")).Bold(true).Underline(true)
 
 	doc := titleStyle.Render(tr.Title) + "\n"
+	doc += lipgloss.NewStyle().Foreground(lipgloss.Color("240")).Margin(0, 0, 1, 2).Render(tr.DropStar) + "\n"
 
 	var (
 		isError       bool
@@ -389,7 +403,7 @@ func (m TunnelModel) View() string {
 				minState = t.State
 			}
 		}
-		if t.State == stateStartingProxy || t.State == stateDownloading || t.State == stateStartingTunnel || t.State == stateRegistering {
+		if t.State == stateStartingProxy || t.State == stateDownloading || t.State == stateStartingTunnel || t.State == stateRegistering || t.State == stateVerifyingDNS {
 			anyStarting = true
 		}
 		if t.State == stateDownloading {
@@ -410,7 +424,8 @@ func (m TunnelModel) View() string {
 		return doc
 	}
 
-	// Check if any tunnel is in conflict state - render interactive menu
+	// 1. Render conflict menu
+	// Check if any tunnel is in conflict state and render the interactive menu
 	for i, t := range m.Tunnels {
 		if t.State == stateConflict {
 			doc += labelStyle.Render(tr.Version) + valStyle.Render(AppVersion) + "\n"
@@ -441,7 +456,10 @@ func (m TunnelModel) View() string {
 	// 2. Render Status Line
 	var statusVal string
 	if isError {
-		statusVal = lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Bold(true).Render("ERROR: " + errMsg)
+		if strings.Contains(errMsg, "Cloudflare rate limited") {
+			errMsg = tr.ErrCFRateLimit
+		}
+		statusVal = lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Bold(true).Render(tr.ErrorPrefix + errMsg)
 	} else if anyStarting {
 		var stateText string
 		switch minState {
@@ -453,6 +471,8 @@ func (m TunnelModel) View() string {
 			stateText = tr.EstablishTunnel
 		case stateRegistering:
 			stateText = tr.MapSubdomain
+		case stateVerifyingDNS:
+			stateText = tr.VerifyingDNS
 		default:
 			stateText = tr.Starting
 		}
@@ -554,8 +574,10 @@ func (m TunnelModel) View() string {
 				sColor = lipgloss.Color("196")
 			}
 
+			// Status is always 3 digits, so it aligns perfectly without padding
 			statusTxt := lipgloss.NewStyle().Foreground(sColor).Render(fmt.Sprintf("%d", log.Status))
-			methodTxt := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("252")).Width(6).Render(log.Method)
+			// Method is padded to 6 chars, aligned left
+			methodTxt := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("252")).Width(6).Align(lipgloss.Left).Render(log.Method)
 			timeTxt := lipgloss.NewStyle().Foreground(lipgloss.Color("241")).MarginLeft(2).Render(log.Time.Format("15:04:05"))
 
 			var nameTxt string
@@ -565,8 +587,8 @@ func (m TunnelModel) View() string {
 
 			path := log.Path
 
-			// Dynamic width calculation for path
-			fixedWidth := 30 // Time(10) + Method(7) + Status(4) + Spacing(9)
+			// Dynamic width calculation for path capping
+			fixedWidth := 30 // Time(10) + Status(4) + Method(6) + Spacing(10)
 			if len(m.Tunnels) > 1 {
 				fixedWidth += 9 // Name(9)
 			}
@@ -576,13 +598,18 @@ func (m TunnelModel) View() string {
 				pathWidth = 40 // Default fallback if terminal is too narrow
 			}
 
+			// Cap the maximum width
+			if pathWidth > 80 {
+				pathWidth = 80
+			}
+
 			if len(path) > pathWidth {
 				path = path[:pathWidth-3] + "..."
 			}
 
-			pathTxt := lipgloss.NewStyle().Foreground(lipgloss.Color("250")).Width(pathWidth).Render(path)
+			pathTxt := lipgloss.NewStyle().Foreground(lipgloss.Color("250")).Render(path)
 
-			doc += fmt.Sprintf("%s  %s%s %s %s\n", timeTxt, nameTxt, methodTxt, pathTxt, statusTxt)
+			doc += fmt.Sprintf("%s %s %s %s%s\n", timeTxt, statusTxt, methodTxt, nameTxt, pathTxt)
 		}
 		doc += "\n"
 	}
