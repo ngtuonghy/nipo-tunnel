@@ -9,17 +9,18 @@ import (
 	"strings"
 	"time"
 
+	"nipo-tunnel/internal/tunnel"
+	"nipo-tunnel/pkg/config"
+
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"nipo/pkg/config"
-	"nipo/internal/tunnel"
 )
 
 type state int
 
-var AppVersion = "0.0.1"
+var AppVersion = "v0.0.16" // x-release-please-version
 
 const (
 	stateStartingProxy state = iota
@@ -308,7 +309,7 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.Tunnels[msg.id].PublicURL = fmt.Sprintf("https://%s.ngtuonghy.online", m.Tunnels[msg.id].Config.Subdomain)
 			m.Tunnels[msg.id].State = stateDone
-			
+
 			// Start session timer only when tunnel successfully connects
 			if m.SessionEndsAt.IsZero() {
 				m.SessionEndsAt = time.Now().Add(9 * time.Hour)
@@ -366,13 +367,13 @@ func (m TunnelModel) View() string {
 	doc := titleStyle.Render(tr.Title) + "\n"
 
 	var (
-		isError      bool
-		errMsg       string
-		totalTraffic uint64
-		unifiedLogs  []tunnel.RequestLog
-		allDone      = true
-		anyStarting  = false
-		minState     = stateDone
+		isError       bool
+		errMsg        string
+		totalTraffic  uint64
+		unifiedLogs   []tunnel.RequestLog
+		allDone       = true
+		anyStarting   = false
+		minState      = stateDone
 		isDownloading bool
 	)
 	for _, t := range m.Tunnels {
@@ -403,7 +404,7 @@ func (m TunnelModel) View() string {
 	if isDownloading && !isError {
 		doc := titleStyle.Render(tr.Title) + "\n"
 		msgStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("250")).Margin(1, 0, 1, 2)
-		doc += msgStyle.Render(m.Spinner.View() + tr.DownloadBinary) + "\n\n"
+		doc += msgStyle.Render(m.Spinner.View()+tr.DownloadBinary) + "\n\n"
 		doc += lipgloss.NewStyle().MarginLeft(2).Render(m.Progress.View()) + "\n\n"
 		doc += lipgloss.NewStyle().Foreground(lipgloss.Color("241")).MarginLeft(2).Render(tr.PressQuit) + "\n"
 		return doc
@@ -556,25 +557,25 @@ func (m TunnelModel) View() string {
 			statusTxt := lipgloss.NewStyle().Foreground(sColor).Render(fmt.Sprintf("%d", log.Status))
 			methodTxt := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("252")).Width(6).Render(log.Method)
 			timeTxt := lipgloss.NewStyle().Foreground(lipgloss.Color("241")).MarginLeft(2).Render(log.Time.Format("15:04:05"))
-			
+
 			var nameTxt string
 			if len(m.Tunnels) > 1 {
-				nameTxt = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Width(8).Render("[" + log.TunnelName + "]") + " "
+				nameTxt = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Width(8).Render("["+log.TunnelName+"]") + " "
 			}
 
 			path := log.Path
-			
+
 			// Dynamic width calculation for path
 			fixedWidth := 30 // Time(10) + Method(7) + Status(4) + Spacing(9)
 			if len(m.Tunnels) > 1 {
 				fixedWidth += 9 // Name(9)
 			}
-			
+
 			pathWidth := m.Width - fixedWidth
 			if pathWidth < 20 {
 				pathWidth = 40 // Default fallback if terminal is too narrow
 			}
-			
+
 			if len(path) > pathWidth {
 				path = path[:pathWidth-3] + "..."
 			}

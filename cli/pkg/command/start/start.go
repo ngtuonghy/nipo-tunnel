@@ -2,8 +2,8 @@ package start
 
 import (
 	"fmt"
-	"nipo/pkg/config"
-	"nipo/pkg/ui"
+	"nipo-tunnel/pkg/config"
+	"nipo-tunnel/pkg/ui"
 	"os"
 	"os/signal"
 	"syscall"

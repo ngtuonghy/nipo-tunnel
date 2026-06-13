@@ -2,7 +2,7 @@ package version
 
 import (
 	"fmt"
-	"nipo/pkg/ui"
+	"nipo-tunnel/pkg/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ func Command() *cobra.Command {
 		Use:   "version",
 		Short: "Print the version number of Nipo",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Nipo v%s\n", ui.AppVersion)
+			fmt.Printf("Nipo %s\n", ui.AppVersion)
 		},
 	}
 

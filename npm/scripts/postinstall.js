@@ -24,7 +24,7 @@ if (!releaseName) {
   process.exit(1);
 }
 
-const url = `https://github.com/ngtuonghy/nipo/releases/download/v${version}/${releaseName}`;
+const url = `https://github.com/ngtuonghy/nipo-tunnel/releases/download/v${version}/${releaseName}`;
 
 const destDir = path.join(os.homedir(), '.nipo', 'bin');
 if (!fs.existsSync(destDir)) {

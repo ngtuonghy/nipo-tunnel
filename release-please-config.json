@@ -1,0 +1,20 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "npm/package.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "backend/package.json",
+          "jsonpath": "$.version"
+        },
+        "cli/pkg/ui/tui.go"
+      ]
+    }
+  }
+}

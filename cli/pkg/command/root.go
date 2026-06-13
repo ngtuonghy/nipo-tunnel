@@ -3,13 +3,13 @@ package command
 import (
 	"strings"
 
-	config_cmd "nipo/pkg/command/config"
-	"nipo/pkg/command/http"
-	"nipo/pkg/command/start"
-	"nipo/pkg/command/status"
-	"nipo/pkg/command/version"
-	"nipo/pkg/config"
-	"nipo/pkg/ui"
+	config_cmd "nipo-tunnel/pkg/command/config"
+	"nipo-tunnel/pkg/command/http"
+	"nipo-tunnel/pkg/command/start"
+	"nipo-tunnel/pkg/command/status"
+	"nipo-tunnel/pkg/command/version"
+	"nipo-tunnel/pkg/config"
+	"nipo-tunnel/pkg/ui"
 
 	"github.com/spf13/cobra"
 )

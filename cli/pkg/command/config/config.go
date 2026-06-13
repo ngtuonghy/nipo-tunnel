@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"nipo/pkg/config"
-	"nipo/pkg/ui"
+	"nipo-tunnel/pkg/config"
+	"nipo-tunnel/pkg/ui"
 )
 
 // Command creates and returns the config cobra subcommand to manage language options.

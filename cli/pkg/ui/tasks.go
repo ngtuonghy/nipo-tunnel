@@ -11,7 +11,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"nipo/internal/tunnel"
+	"nipo-tunnel/internal/tunnel"
 )
 
 type downloadCompleteMsg struct {

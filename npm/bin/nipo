@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+const { spawnSync } = require('child_process');
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
+
+const isWin = process.platform === 'win32';
+const bin = path.join(os.homedir(), '.nipo', 'bin', isWin ? 'nipo.exe' : 'nipo');
+
+if (!fs.existsSync(bin)) {
+  console.error(`\x1b[31mError: Nipo core binary not found at ${bin}\x1b[0m`);
+  console.error(`Please try re-installing the package: npm install -g nipo-tunnel`);
+  process.exit(1);
+}
+
+const result = spawnSync(bin, process.argv.slice(2), { stdio: 'inherit' });
+process.exit(result.status ?? 1);

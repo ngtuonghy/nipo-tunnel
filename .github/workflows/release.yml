@@ -2,15 +2,27 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+
   build-binaries:
     name: Build Go Binaries
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,42 +54,22 @@ jobs:
       - name: Build binary
         run: |
           cd cli
-          TAG_VERSION=${GITHUB_REF_NAME#v}
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -ldflags "-s -w -X nipo/pkg/ui.AppVersion=$TAG_VERSION" -o ../dist/${{ matrix.release_name }} ./cmd/nipo
+          TAG_VERSION=${{ needs.release-please.outputs.tag_name }}
+          TAG_VERSION=${TAG_VERSION#v}
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -ldflags "-s -w -X nipo-tunnel/pkg/ui.AppVersion=$TAG_VERSION" -o ../dist/${{ matrix.release_name }} ./cmd/nipo
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.release_name }}
-          path: dist/${{ matrix.release_name }}
-          if-no-files-found: error
-          retention-days: 1
-
-  create-release:
-    name: Create GitHub Release
-    needs: build-binaries
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-          merge-multiple: true
-
-      - name: Create Release
+      - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
-          fail_on_unmatched_files: true
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: dist/${{ matrix.release_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
     name: Publish to NPM
-    needs: create-release
+    needs: [release-please]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -89,11 +81,34 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Sync version and publish
+      - name: Publish
         run: |
           cd npm
-          TAG_VERSION=${GITHUB_REF_NAME#v}
-          npm version --no-git-tag-version $TAG_VERSION
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  deploy-backend:
+    name: Deploy Backend to Cloudflare
+    needs: [release-please]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: 'backend'

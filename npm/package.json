@@ -1,6 +1,6 @@
 {
-  "name": "nipo",
-  "version": "0.0.1",
+  "name": "nipo-tunnel",
+  "version": "0.0.16",
   "description": "Secure HTTP tunnels from localhost to the internet",
   "bin": {
     "nipo": "bin/nipo"
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ngtuonghy/nipo"
+    "url": "https://github.com/ngtuonghy/nipo-tunnel"
   },
   "keywords": [
     "tunnel",

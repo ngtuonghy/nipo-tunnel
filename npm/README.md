@@ -7,7 +7,7 @@ Production-ready tunneling platform. Create secure HTTP tunnels from localhost t
 Install globally via npm:
 
 ```bash
-npm install -g nipo
+npm install -g nipo-tunnel
 ```
 
 ## Quick Start

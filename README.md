@@ -14,27 +14,29 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/ngtuonghy/nipo">
+  <a href="https://github.com/ngtuonghy/nipo-tunnel">
     <img src="assets/logo.png" alt="Logo" width="160" height="160" style="border-radius: 20px;">
   </a>
 
-<h3 align="center">NIPO</h3>
+<h3 align="center">NIPO TUNNEL</h3>
 
   <p align="center">
     A production-ready secure HTTP tunneling tool from localhost to the internet. Built in Go.
     <br />
-    <a href="docs/README-vi.md"><strong>🇻🇳 Đọc bằng Tiếng Việt</strong></a>
+    <a href="docs/README-vi.md"><strong>Tiếng Việt</strong></a>
     <br />
     <br />
-    <a href="https://github.com/ngtuonghy/nipo">View Demo</a>
+    <a href="https://github.com/ngtuonghy/nipo-tunnel">View Demo</a>
     ·
-    <a href="https://github.com/ngtuonghy/nipo/issues">Report Bug</a>
+    <a href="https://github.com/ngtuonghy/nipo-tunnel/issues">Report Bug</a>
     ·
-    <a href="https://github.com/ngtuonghy/nipo/issues">Request Feature</a>
+    <a href="https://github.com/ngtuonghy/nipo-tunnel/issues">Request Feature</a>
   </p>
 </div>
 
-
+<div align="center">
+  <img src="assets/demo.jpg" alt="Nipo Terminal UI Demo">
+</div>
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -67,7 +69,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Nipo is a lightweight CLI tool that exposes local servers to the public internet instantly, featuring a beautiful terminal UI (TUI).
+Nipo is a lightweight CLI tool that exposes local servers to the public internet instantly.
 
 ### Key Features
 * **Interactive TUI**: Displays real-time bandwidth, connection status, and logs.
@@ -103,7 +105,22 @@ Follow these instructions to install and use Nipo.
 Install Nipo globally using npm:
 
 ```bash
-npm install -g nipo
+npm install -g nipo-tunnel
+```
+
+### Uninstallation
+
+To completely remove Nipo Tunnel and its configuration from your system:
+
+```bash
+# 1. Uninstall the npm package
+npm uninstall -g nipo-tunnel
+
+# 2. Remove configuration and core binary
+# Windows (PowerShell)
+Remove-Item -Recurse -Force ~/.nipo
+# Mac/Linux
+rm -rf ~/.nipo
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -172,7 +189,7 @@ If the custom subdomain you request is already in use by another active tunnel, 
 * **Exit**: Cancels the execution so you can try another subdomain.
 
 ### Can I run Nipo without Node.js?
-Yes! The npm package is simply a convenient wrapper. If you do not have Node.js installed, you can go to the [Releases](https://github.com/ngtuonghy/nipo/releases) section, download the native compiled Go binary for your OS, rename it to `nipo` (or `nipo.exe` on Windows), and add it to your system PATH.
+Yes! The npm package is simply a convenient wrapper. If you do not have Node.js installed, you can go to the [Releases](https://github.com/ngtuonghy/nipo-tunnel/releases) section, download the native compiled Go binary for your OS, rename it to `nipo` (or `nipo.exe` on Windows), and add it to your system PATH.
 
 ### Executable Permission Issues (Linux / macOS)
 Nipo automatically sets execution permissions (`chmod +x`) on all downloaded helper binaries. However, if you encounter a `permission denied` error running the cloudflared daemon, you can run:
@@ -192,7 +209,7 @@ chmod +x ~/.nipo/bin/cloudflared
 - [ ] Visual web-based dashboard for request inspection.
 - [ ] Add TCP raw port forwarding.
 
-See the [open issues](https://github.com/ngtuonghy/nipo/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/ngtuonghy/nipo-tunnel/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -230,7 +247,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ngtuonghy - [@ngtuonghy](https://github.com/ngtuonghy)
 
-Project Link: [https://github.com/ngtuonghy/nipo](https://github.com/ngtuonghy/nipo)
+Project Link: [https://github.com/ngtuonghy/nipo-tunnel](https://github.com/ngtuonghy/nipo-tunnel)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -251,16 +268,16 @@ Project Link: [https://github.com/ngtuonghy/nipo](https://github.com/ngtuonghy/n
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/ngtuonghy/nipo.svg?style=for-the-badge
-[contributors-url]: https://github.com/ngtuonghy/nipo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/ngtuonghy/nipo.svg?style=for-the-badge
-[forks-url]: https://github.com/ngtuonghy/nipo/network/members
-[stars-shield]: https://img.shields.io/github/stars/ngtuonghy/nipo.svg?style=for-the-badge
-[stars-url]: https://github.com/ngtuonghy/nipo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/ngtuonghy/nipo.svg?style=for-the-badge
-[issues-url]: https://github.com/ngtuonghy/nipo/issues
-[license-shield]: https://img.shields.io/github/license/ngtuonghy/nipo.svg?style=for-the-badge
-[license-url]: https://github.com/ngtuonghy/nipo/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/ngtuonghy/nipo-tunnel.svg?style=for-the-badge
+[contributors-url]: https://github.com/ngtuonghy/nipo-tunnel/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ngtuonghy/nipo-tunnel.svg?style=for-the-badge
+[forks-url]: https://github.com/ngtuonghy/nipo-tunnel/network/members
+[stars-shield]: https://img.shields.io/github/stars/ngtuonghy/nipo-tunnel.svg?style=for-the-badge
+[stars-url]: https://github.com/ngtuonghy/nipo-tunnel/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ngtuonghy/nipo-tunnel.svg?style=for-the-badge
+[issues-url]: https://github.com/ngtuonghy/nipo-tunnel/issues
+[license-shield]: https://img.shields.io/github/license/ngtuonghy/nipo-tunnel.svg?style=for-the-badge
+[license-url]: https://github.com/ngtuonghy/nipo-tunnel/blob/main/LICENSE
 [Go-badge]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
 [Go-url]: https://go.dev/
 [Node-badge]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node-dot-js&logoColor=white

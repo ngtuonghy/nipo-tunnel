@@ -100,7 +100,8 @@ app.all('*', async (c) => {
   const targetUrlString = await c.env.NIPO_KV.get(subdomain)
 
   if (!targetUrlString) {
-    return c.text('Nipo Tunnel not found or has expired.', 404)
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tunnel Not Found | Nipo</title><style>body{font-family:system-ui,sans-serif;margin:3rem 2rem;background:#f8f9fa;color:#212529}.container{max-width:600px}h1{margin-top:0;color:#dc3545;font-size:1.5rem}p{color:#6c757d;line-height:1.5;margin-bottom:0.5rem}.author{font-size:0.875rem;color:#adb5bd;margin-top:1.5rem;font-weight:500}</style></head><body><div class="container"><h1>Tunnel Offline</h1><p>This Nipo tunnel is currently not found or has expired.</p><div class="author">by ngtuonghy</div></div></body></html>`;
+    return c.html(html, 404)
   }
 
   // Map original path and query to the target URL

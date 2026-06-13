@@ -9,8 +9,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
-	"nipo/pkg/config"
-	"nipo/pkg/ui"
+	"nipo-tunnel/pkg/config"
+	"nipo-tunnel/pkg/ui"
 )
 
 // Command creates and returns the http cobra subcommand to start a single tunnel.

@@ -1,6 +1,6 @@
 package ui
 
-import "nipo/pkg/config"
+import "nipo-tunnel/pkg/config"
 
 // Translation defines the localized string resources used across the TUI.
 type Translation struct {
