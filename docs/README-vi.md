@@ -15,13 +15,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/ngtuonghy/nipo-tunnel">
-    <img src="../assets/logo.png" alt="Logo" width="160" height="160" style="border-radius: 20px;">
+    <img src="assets/logo.png" alt="Logo" width="160" height="160" style="border-radius: 20px;">
   </a>
 
 <h3 align="center">NIPO TUNNEL</h3>
 
   <p align="center">
-    Công cụ tạo HTTP tunnel bảo mật từ localhost ra internet. Xây dựng bằng Go.
+    Công cụ tạo HTTP tunnel bảo mật từ local ra internet hoàn toàn miễn phí. Sử dụng mạng lưới Cloudflare - không cần tài khoản, không cần cấu hình.
     <br />
     <br />
     <a href="../README.md"><strong>English</strong></a>
@@ -36,7 +36,7 @@
 </div>
 
 <div align="center">
-  <img src="../assets/demo.jpg" alt="Nipo Terminal UI Demo">
+  <img src="assets/demo.jpg" alt="Nipo Terminal UI Demo">
 </div>
 
 <!-- TABLE OF CONTENTS -->

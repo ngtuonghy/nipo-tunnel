@@ -21,7 +21,7 @@
 <h3 align="center">NIPO TUNNEL</h3>
 
   <p align="center">
-    A production-ready secure HTTP tunneling tool from localhost to the internet. Built in Go.
+    Fast, secure, and 100% free HTTP tunnels from local to the internet. Powered by Cloudflare - no account or config required.
     <br />
     <a href="docs/README-vi.md"><strong>Tiếng Việt</strong></a>
     <br />
