@@ -6,7 +6,7 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'Nipo Docs',
+			title: 'Nipo Tunnel',
 			logo: {
 				src: './src/assets/logo.png',
 			},
