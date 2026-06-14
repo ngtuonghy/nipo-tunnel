@@ -1,0 +1,32 @@
+---
+title: Chào mừng đến với Nipo
+description: Bắt đầu xây dựng ứng dụng của bạn với Nipo.
+template: splash
+hero:
+  tagline: Trang tài liệu chính thức cho dự án Nipo.
+  image:
+    file: ../../../assets/logo.png
+  actions:
+    - text: Xem hướng dẫn
+      link: /vi/guides/introduction/
+      icon: right-arrow
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Vì sao chọn Nipo?
+
+<CardGrid stagger>
+	<Card title="Giao diện TUI trực quan" icon="laptop">
+		Hiển thị băng thông thời gian thực, trạng thái kết nối và nhật ký ngay trên terminal của bạn.
+	</Card>
+	<Card title="Đa đường hầm (Multi-Tunneling)" icon="rocket">
+		Công khai nhiều cổng kết nối cùng lúc chỉ với một file cấu hình `nipo.yml`.
+	</Card>
+	<Card title="Cài đặt tự động" icon="setting">
+		Tự động tải xuống công cụ `cloudflared` lõi ở lần chạy đầu tiên. Không cần đăng ký tài khoản.
+	</Card>
+	<Card title="Nhanh & Miễn phí" icon="star">
+		Được hỗ trợ bởi hạ tầng của Cloudflare giúp kết nối bảo mật, tốc độ cao trên toàn cầu.
+	</Card>
+</CardGrid>

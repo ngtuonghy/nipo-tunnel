@@ -1,0 +1,32 @@
+---
+title: Welcome to Nipo
+description: Get started building your app with Nipo.
+template: splash
+hero:
+  tagline: Official technical documentation for the Nipo project.
+  image:
+    file: ../../assets/logo.png
+  actions:
+    - text: Introduction
+      link: /guides/introduction/
+      icon: right-arrow
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why Nipo?
+
+<CardGrid stagger>
+	<Card title="Interactive TUI" icon="laptop">
+		Displays real-time bandwidth, connection status, and logs right in your terminal.
+	</Card>
+	<Card title="Multi-Tunneling" icon="rocket">
+		Expose multiple ports simultaneously via a single `nipo.yml` configuration file.
+	</Card>
+	<Card title="Automatic Setup" icon="setting">
+		Instantly downloads the native `cloudflared` daemon on the first run. No account required.
+	</Card>
+	<Card title="Fast & Free" icon="star">
+		Powered by Cloudflare infrastructure to provide secure, high-speed HTTP tunnels globally.
+	</Card>
+</CardGrid>
