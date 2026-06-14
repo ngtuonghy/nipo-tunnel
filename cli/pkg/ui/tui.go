@@ -126,6 +126,7 @@ func (m TunnelModel) ShutdownWithFeedback() {
 		linesWritten++
 	}
 
+	config.ClearState()
 	m.Cleanup()
 
 	// Erase the lines we printed above
@@ -327,6 +328,7 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.SessionEndsAt.IsZero() {
 				m.SessionEndsAt = time.Now().Add(9 * time.Hour)
 			}
+			m.saveState()
 		}
 
 		// Check if ALL tunnels are now done, then start a single heartbeat for all
@@ -618,4 +620,21 @@ func (m TunnelModel) View() string {
 	doc += lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Margin(0, 0, 0, 2).Render(tr.PressQuit) + "\n"
 
 	return doc
+}
+
+func (m TunnelModel) saveState() {
+	var states []config.TunnelState
+	for _, t := range m.Tunnels {
+		if t.State == stateDone {
+			states = append(states, config.TunnelState{
+				Name:      t.Config.Name,
+				Port:      t.Config.Port,
+				Subdomain: t.Config.Subdomain,
+				URL:       t.PublicURL,
+			})
+		}
+	}
+	if len(states) > 0 {
+		config.SaveState(states)
+	}
 }
