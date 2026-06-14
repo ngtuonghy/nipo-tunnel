@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.2...v0.2.3) (2026-06-14)
+
+
+### Bug Fixes
+
+* **cli:** migrate base domain to nipo-tunnel.online ([150befc](https://github.com/ngtuonghy/nipo-tunnel/commit/150befc524a6d484791d59fe9b36ec4801fd8293))
+
 ## [0.2.2](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.1...v0.2.2) (2026-06-14)
 
 
