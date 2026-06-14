@@ -310,7 +310,7 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Tunnels[msg.id].Err = msg.err
 			}
 		} else {
-			m.Tunnels[msg.id].PublicURL = fmt.Sprintf("https://%s.ngtuonghy.online", m.Tunnels[msg.id].Config.Subdomain)
+			m.Tunnels[msg.id].PublicURL = fmt.Sprintf("https://%s.nipo-tunnel.online", m.Tunnels[msg.id].Config.Subdomain)
 			m.Tunnels[msg.id].State = stateVerifyingDNS
 			return m, verifyDNSTask(m.Ctx, msg.id, m.Tunnels[msg.id].PublicURL)
 		}

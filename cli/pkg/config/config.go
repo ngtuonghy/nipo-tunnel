@@ -26,7 +26,7 @@ type TunnelConfig struct {
 }
 
 // DefaultBackendURL is the hardcoded API gateway backend for Nipo tunnels.
-const DefaultBackendURL = "https://api.ngtuonghy.online"
+const DefaultBackendURL = "https://api.nipo-tunnel.online"
 
 // Config represents the application configuration schema.
 type Config struct {
