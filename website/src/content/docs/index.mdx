@@ -72,35 +72,73 @@ nipo http 3000
 
 ## How it Works
 
-<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '3rem', marginBottom: '4rem', fontSize: '0.9rem' }}>
-  <div style={{ padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--sl-color-gray-5)', backgroundColor: 'var(--sl-color-bg-nav)', textAlign: 'center', minWidth: '160px' }}>
+<style>{`
+  .arch-diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    margin-bottom: 4rem;
+    font-size: 0.9rem;
+  }
+  .arch-box {
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--sl-color-gray-5);
+    background-color: var(--sl-color-bg-nav);
+    text-align: center;
+    min-width: 160px;
+    flex: 1;
+  }
+  .arch-arrow {
+    color: var(--sl-color-text-accent);
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  @media (max-width: 768px) {
+    .arch-diagram {
+      flex-direction: column;
+    }
+    .arch-arrow {
+      transform: rotate(90deg);
+    }
+    .arch-box {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+`}</style>
+
+<div className="arch-diagram">
+  <div className="arch-box">
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem', color: 'var(--sl-color-text-accent)' }}><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg></div>
     <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Local Server</div>
     <div style={{ opacity: 0.8 }}><code>localhost:3000</code></div>
   </div>
 
-  <div style={{ color: 'var(--sl-color-text-accent)', fontWeight: 'bold', fontSize: '1.5rem' }}>⟷</div>
+  <div className="arch-arrow">⟷</div>
 
-  <div style={{ padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--sl-color-gray-5)', backgroundColor: 'var(--sl-color-bg-nav)', textAlign: 'center', minWidth: '160px' }}>
+  <div className="arch-box">
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem', color: 'var(--sl-color-text-accent)' }}><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg></div>
     <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Nipo CLI</div>
     <div style={{ opacity: 0.8 }}>Instant Proxy</div>
   </div>
 
-  <div style={{ color: 'var(--sl-color-text-accent)', fontWeight: 'bold', fontSize: '1.5rem' }}>⟷</div>
+  <div className="arch-arrow">⟷</div>
 
-  <div style={{ padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--sl-color-gray-5)', backgroundColor: 'var(--sl-color-bg-nav)', textAlign: 'center', minWidth: '160px' }}>
+  <div className="arch-box">
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem', color: 'var(--sl-color-text-accent)' }}><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg></div>
     <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Cloudflare</div>
     <div style={{ opacity: 0.8 }}>Edge Network</div>
   </div>
 
-  <div style={{ color: 'var(--sl-color-text-accent)', fontWeight: 'bold', fontSize: '1.5rem' }}>⟷</div>
+  <div className="arch-arrow">⟷</div>
 
-  <div style={{ padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--sl-color-gray-5)', backgroundColor: 'var(--sl-color-bg-nav)', textAlign: 'center', minWidth: '160px' }}>
+  <div className="arch-box">
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem', color: 'var(--sl-color-text-accent)' }}><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
     <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Public Internet</div>
-    <div style={{ opacity: 0.8 }}><code>myapp.nipo-tunnel.online</code></div>
+    <div style={{ opacity: 0.8 }}><code>nipo.online</code></div>
   </div>
 </div>
 
