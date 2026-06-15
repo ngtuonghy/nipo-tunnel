@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.6...v0.2.7) (2026-06-15)
+
+
+### Bug Fixes
+
+* **website:** make architecture diagram fully responsive on mobile ([507aa99](https://github.com/ngtuonghy/nipo-tunnel/commit/507aa9975e4770c6b755bf5756873ef3cd75fa25))
+
 ## [0.2.6](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.5...v0.2.6) (2026-06-15)
 
 
