@@ -20,7 +20,7 @@ import (
 
 type state int
 
-var AppVersion = "v0.2.4" // x-release-please-version
+var AppVersion = "v0.2.5" // x-release-please-version
 
 const (
 	stateStartingProxy state = iota
@@ -371,6 +371,13 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m TunnelModel) View() string {
 	tr := GetT()
 
+	maxNameLen := 8
+	for _, t := range m.Tunnels {
+		if len(t.Config.Name) > maxNameLen {
+			maxNameLen = len(t.Config.Name)
+		}
+	}
+
 	titleStyle := lipgloss.NewStyle().
 		Bold(true).
 		Foreground(lipgloss.Color("205")).
@@ -537,7 +544,7 @@ func (m TunnelModel) View() string {
 			if t.PublicURL != "" {
 				pubStr := urlStyle.Render(t.PublicURL) + lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render(fmt.Sprintf(" -> http://localhost:%d", t.Config.Port))
 				if isMulti {
-					nameFormat := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220")).Width(12).Render(t.Config.Name)
+					nameFormat := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220")).Width(maxNameLen).Render(t.Config.Name)
 					doc += labelStyle.Render(label) + nameFormat + pubStr + "\n"
 				} else {
 					doc += labelStyle.Render(label) + pubStr + "\n"
@@ -546,7 +553,7 @@ func (m TunnelModel) View() string {
 			} else if t.NodeURL != "" {
 				nodeStr := fmt.Sprintf("%s -> http://localhost:%d", t.NodeURL, t.Config.Port)
 				if isMulti {
-					nameFormat := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220")).Width(12).Render(t.Config.Name)
+					nameFormat := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220")).Width(maxNameLen).Render(t.Config.Name)
 					doc += labelStyle.Render(label) + nameFormat + valStyle.Render(nodeStr) + "\n"
 				} else {
 					doc += labelStyle.Render(label) + valStyle.Render(nodeStr) + "\n"
@@ -579,21 +586,22 @@ func (m TunnelModel) View() string {
 
 			// Status is always 3 digits, so it aligns perfectly without padding
 			statusTxt := lipgloss.NewStyle().Foreground(sColor).Render(fmt.Sprintf("%d", log.Status))
-			// Method is padded to 6 chars, aligned left
-			methodTxt := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("252")).Width(6).Align(lipgloss.Left).Render(log.Method)
+			// Method is padded to 7 chars, aligned left (handles OPTIONS and CONNECT)
+			methodTxt := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("252")).Width(7).Align(lipgloss.Left).Render(log.Method)
 			timeTxt := lipgloss.NewStyle().Foreground(lipgloss.Color("241")).MarginLeft(2).Render(log.Time.Format("15:04:05"))
 
 			var nameTxt string
 			if len(m.Tunnels) > 1 {
-				nameTxt = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Width(8).Render("["+log.TunnelName+"]") + " "
+				nameWidth := maxNameLen + 2
+				nameTxt = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Width(nameWidth).Render("["+log.TunnelName+"]") + " "
 			}
 
 			path := log.Path
 
 			// Dynamic width calculation for path capping
-			fixedWidth := 30 // Time(10) + Status(4) + Method(6) + Spacing(10)
+			fixedWidth := 31 // Time(10) + Status(4) + Method(7) + Spacing(10)
 			if len(m.Tunnels) > 1 {
-				fixedWidth += 9 // Name(9)
+				fixedWidth += (maxNameLen + 2) + 1 // Name width + 1 space
 			}
 
 			pathWidth := m.Width - fixedWidth

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.4...v0.2.5) (2026-06-15)
+
+
+### Bug Fixes
+
+* **cli:** make tunnel name and HTTP method widths dynamic in TUI ([eed236a](https://github.com/ngtuonghy/nipo-tunnel/commit/eed236a735cfc7bbdb37f9d29aea1ec30c7c43ec))
+
 ## [0.2.4](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.3...v0.2.4) (2026-06-15)
 
 
