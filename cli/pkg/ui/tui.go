@@ -20,7 +20,7 @@ import (
 
 type state int
 
-var AppVersion = "v0.2.6" // x-release-please-version
+var AppVersion = "v0.2.7" // x-release-please-version
 
 const (
 	stateStartingProxy state = iota
@@ -166,7 +166,7 @@ func uiTick() tea.Cmd {
 func (m TunnelModel) Init() tea.Cmd {
 	cmds := []tea.Cmd{m.Spinner.Tick, uiTick(), downloadTask(m.DownloadChan), listenToProgress(m.DownloadChan)}
 	for i, t := range m.Tunnels {
-		cmds = append(cmds, startProxyTask(m.Ctx, i, t.Config.Name, t.Config.Port))
+		cmds = append(cmds, startProxyTask(m.Ctx, i, t.Config.Name, t.Config.Port, t.Config.Subdomain))
 	}
 	return tea.Batch(cmds...)
 }
@@ -206,6 +206,9 @@ func (m TunnelModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						}
 						newSub := fmt.Sprintf("%s-%05d", base, rand.Intn(100000))
 						m.Tunnels[i].Config.Subdomain = newSub
+						if m.Tunnels[i].Proxy != nil {
+							m.Tunnels[i].Proxy.CustomHost = newSub + ".nipo-tunnel.online"
+						}
 						m.Tunnels[i].State = stateRegistering
 						return m, registerTask(m.Ctx, i, m.BackendURL, newSub, m.Tunnels[i].NodeURL)
 					}
@@ -555,7 +558,7 @@ func (m TunnelModel) View() string {
 			if t.PublicURL != "" {
 				padding := ""
 				if len(t.PublicURL) < maxUrlLen {
-					padding = strings.Repeat(" ", maxUrlLen - len(t.PublicURL))
+					padding = strings.Repeat(" ", maxUrlLen-len(t.PublicURL))
 				}
 				pubStr := urlStyle.Render(t.PublicURL) + padding + lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render(fmt.Sprintf(" -> http://localhost:%d", t.Config.Port))
 				if isMulti {
@@ -568,7 +571,7 @@ func (m TunnelModel) View() string {
 			} else if t.NodeURL != "" {
 				padding := ""
 				if len(t.NodeURL) < maxUrlLen {
-					padding = strings.Repeat(" ", maxUrlLen - len(t.NodeURL))
+					padding = strings.Repeat(" ", maxUrlLen-len(t.NodeURL))
 				}
 				nodeStr := valStyle.Render(t.NodeURL) + padding + lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render(fmt.Sprintf(" -> http://localhost:%d", t.Config.Port))
 				if isMulti {

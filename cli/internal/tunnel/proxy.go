@@ -66,6 +66,7 @@ type Proxy struct {
 	TargetPort int
 	ListenPort int
 	Logger     *charmlog.Logger
+	CustomHost string
 }
 
 type trackingResponseWriter struct {
@@ -103,18 +104,26 @@ func (w *trackingResponseWriter) Unwrap() http.ResponseWriter {
 }
 
 // StartProxy starts a local reverse proxy that tracks requests and bytes.
-func StartProxy(ctx context.Context, tunnelName string, targetPort int) (*Proxy, error) {
+func StartProxy(ctx context.Context, tunnelName string, targetPort int, customHost string) (*Proxy, error) {
 	targetURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", targetPort))
 	if err != nil {
 		return nil, fmt.Errorf("parse target URL http://localhost:%d: %w", targetPort, err)
 	}
 
-	p := &Proxy{TargetPort: targetPort}
+	p := &Proxy{TargetPort: targetPort, CustomHost: customHost}
 
 	rp := httputil.NewSingleHostReverseProxy(targetURL)
 	// We can use the logger's standard log adapter for errors
 	logger := charmlog.New(io.Discard)
 	rp.ErrorLog = logger.StandardLog(charmlog.StandardLogOptions{ForceLevel: charmlog.ErrorLevel})
+
+	originalDirector := rp.Director
+	rp.Director = func(req *http.Request) {
+		originalDirector(req)
+		if p.CustomHost != "" {
+			req.Host = p.CustomHost
+		}
+	}
 
 
 

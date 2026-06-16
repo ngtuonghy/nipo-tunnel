@@ -74,9 +74,13 @@ func listenToProgress(ch <-chan float64) tea.Cmd {
 }
 
 // startProxyTask returns a Bubble Tea command that starts the local proxy for the given port.
-func startProxyTask(ctx context.Context, id int, tunnelName string, targetPort int) tea.Cmd {
+func startProxyTask(ctx context.Context, id int, tunnelName string, targetPort int, subdomain string) tea.Cmd {
 	return func() tea.Msg {
-		p, err := tunnel.StartProxy(ctx, tunnelName, targetPort)
+		var customHost string
+		if subdomain != "" {
+			customHost = subdomain + ".nipo-tunnel.online"
+		}
+		p, err := tunnel.StartProxy(ctx, tunnelName, targetPort, customHost)
 		return proxyStartedMsg{id: id, proxy: p, err: err}
 	}
 }
