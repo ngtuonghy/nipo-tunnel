@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.7](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.6...v0.2.7) (2026-06-16)
+
+
+### Bug Fixes
+
+* **backend:** rewrite redirect Location header and remove proxy Host/Origin rewrite ([518c4da](https://github.com/ngtuonghy/nipo-tunnel/commit/518c4dac6d5b3d1e9b9b5b3e6ac54e9738b529c9))
+* **cli:** remove Host and Origin rewriting from proxy ([b484e5d](https://github.com/ngtuonghy/nipo-tunnel/commit/b484e5d1e86c59132ae91d8e94d1178081ded18b))
+* **website:** make architecture diagram fully responsive on mobile ([507aa99](https://github.com/ngtuonghy/nipo-tunnel/commit/507aa9975e4770c6b755bf5756873ef3cd75fa25))
+
 ## [0.2.6](https://github.com/ngtuonghy/nipo-tunnel/compare/v0.2.5...v0.2.6) (2026-06-15)
 
 
