@@ -110,7 +110,30 @@ app.all('*', async (c) => {
   targetUrl.search = url.search
 
   // Proxy the request directly to the target tunnel
-  return fetch(new Request(targetUrl.toString(), c.req.raw))
+  const response = await fetch(new Request(targetUrl.toString(), c.req.raw))
+
+  // If the target returns a redirect, rewrite the Location header to use the custom subdomain
+  if ([301, 302, 307, 308].includes(response.status)) {
+    const location = response.headers.get('Location')
+    if (location) {
+      const locationUrl = new URL(location, targetUrl.toString())
+      if (locationUrl.hostname === targetUrl.hostname) {
+        // Rewrite locationUrl's host back to the client's custom subdomain
+        locationUrl.protocol = url.protocol
+        locationUrl.host = url.host
+
+        const newHeaders = new Headers(response.headers)
+        newHeaders.set('Location', locationUrl.toString())
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders
+        })
+      }
+    }
+  }
+
+  return response
 })
 
 export default app
