@@ -20,7 +20,7 @@ import (
 
 type state int
 
-var AppVersion = "v0.2.7" // x-release-please-version
+var AppVersion = "v0.3.0" // x-release-please-version
 
 const (
 	stateStartingProxy state = iota
